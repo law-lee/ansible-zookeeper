@@ -8,17 +8,9 @@ ZooKeeper playbook for Ansible
 Installation
 -----------
 
-```bash
-ansible-galaxy install AnsibleShipyard.ansible-zookeeper
 ```
-
-Dependencies
-------------
-
-Java
-
- - https://github.com/AnsibleShipyard/ansible-java
- - https://github.com/geerlingguy/ansible-role-java
+git clone https://github.com/law-lee/ansible-zookeeper.git
+```
 
 Requirements
 ------------
@@ -27,9 +19,8 @@ Ansible version at least 1.6
 
 Role Variables
 --------------
+```
 
-```yaml
----
 # use the latest minor version of major 3.4
 zookeeper_version: 3.4.14
 zookeeper_url: https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-{{zookeeper_version}}/zookeeper-{{zookeeper_version}}.tar.gz
@@ -63,11 +54,13 @@ zookeeper_conf_dir: {{zookeeper_dir}} # or /etc/zookeeper when zookeeper_debian_
 zookeeper_tarball_dir: /opt/src
 
 zookeeper_hosts_hostname: "{{inventory_hostname}}"
-# List of dict (i.e. {zookeeper_hosts:[{host:,id:},{host:,id:},...]})
-zookeeper_hosts:
-  - host: "{{zookeeper_hosts_hostname}}" # the machine running
-    id: 1
 
+zookeeper_hosts: "
+    {%- set ips = [] %}
+    {%- for host in groups['zookeepers'] %}
+    {{- ips.append(dict(id=loop.index, host=host, ip=hostvars[host]['ansible_default_ipv4'].address)) }}
+    {%- endfor %}
+    {{- ips -}}"
 # Dict of ENV settings to be written into the (optional) conf/zookeeper-env.sh
 zookeeper_env: {}
 
@@ -78,58 +71,16 @@ zookeeper_force_myid: yes
 Example Playbook
 ----------------
 
-```yaml
+```
 - name: Installing ZooKeeper
   hosts: all
   sudo: yes
   roles:
     - role: AnsibleShipyard.ansible-zookeeper
-```
-
-Example Retrieving Tarball From S3
-----------------------------------
-
-```yaml
-- name: Installing ZooKeeper
-  hosts: all
-  sudo: yes
-  vars:
-    zookeeper_archive_s3_bucket: my-s3-bucket
-    zookeeper_archive_s3_object: my/s3/directory/zookeeper-{{zookeeper_version}}.tar.gz
-  roles:
-    - role: AnsibleShipyard.ansible-zookeeper
-```
-
-Cluster Example
-----------------
-
-```yaml
-- name: Zookeeper cluster setup
-  hosts: zookeepers
-  sudo: yes
-  roles:
-    - role: AnsibleShipyard.ansible-zookeeper
-```
-
-Assuming ```zookeepers``` is a [hosts group](http://docs.ansible.com/ansible/intro_inventory.html#group-variables) defined in inventory file.
-
-```inventory
-[zookeepers]
-server[1:3]
-```
-
-Custom IP per host group
-
-```
-zookeeper_hosts: "
-    {%- set ips = [] %}
-    {%- for host in groups['zookeepers'] %}
-    {{- ips.append(dict(id=loop.index, host=host, ip=hostvars[host]['ansible_default_ipv4'].address)) }}
-    {%- endfor %}
-    {{- ips -}}"
 ```
 
 Usage
+-----
 ```
 ansible-playbook -i inventory.ini zookeeper.yaml
 
