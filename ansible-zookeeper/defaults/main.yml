@@ -1,6 +1,6 @@
 ---
-zookeeper_version: 3.4.12
-zookeeper_url: http://www.us.apache.org/dist/zookeeper/zookeeper-{{zookeeper_version}}/zookeeper-{{zookeeper_version}}.tar.gz
+zookeeper_version: 3.4.14
+zookeeper_url: https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-{{zookeeper_version}}/zookeeper-{{zookeeper_version}}.tar.gz
 
 # Flag that selects if systemd or upstart will be used for the init service:
 # Note: by default Ubuntu 15.04 and later use systemd (but support switch to upstart)
@@ -34,9 +34,16 @@ zookeeper_max_rolling_log_file_count: 10
 
 zookeeper_hosts_hostname: "{{inventory_hostname}}"
 # List of dict (i.e. {zookeeper_hosts:[{host:,id:},{host:,id:},...]})
-zookeeper_hosts:
-  - host: "{{zookeeper_hosts_hostname}}" # the machine running
-    id: 1
+#zookeeper_hosts:
+#  - host: "{{zookeeper_hosts_hostname}}" # the machine running
+#    id: 1
+
+zookeeper_hosts: "
+    {%- set ips = [] %}
+    {%- for host in groups['zookeepers'] %}
+    {{- ips.append(dict(id=loop.index, host=host, ip=hostvars[host]['ansible_default_ipv4'].address)) }}
+    {%- endfor %}
+    {{- ips -}}"
 
 # Dict of ENV settings to be written into the (optional) conf/zookeeper-env.sh
 zookeeper_env: {}

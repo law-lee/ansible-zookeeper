@@ -30,8 +30,9 @@ Role Variables
 
 ```yaml
 ---
-zookeeper_version: 3.4.12
-zookeeper_url: http://www.us.apache.org/dist/zookeeper/zookeeper-{{zookeeper_version}}/zookeeper-{{zookeeper_version}}.tar.gz
+# use the latest minor version of major 3.4
+zookeeper_version: 3.4.14
+zookeeper_url: https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-{{zookeeper_version}}/zookeeper-{{zookeeper_version}}.tar.gz
 
 # Flag that selects if systemd or upstart will be used for the init service:
 # Note: by default Ubuntu 15.04 and later use systemd (but support switch to upstart)
@@ -108,7 +109,6 @@ Cluster Example
   sudo: yes
   roles:
     - role: AnsibleShipyard.ansible-zookeeper
-      zookeeper_hosts: "{{groups['zookeepers']}}"
 ```
 
 Assuming ```zookeepers``` is a [hosts group](http://docs.ansible.com/ansible/intro_inventory.html#group-variables) defined in inventory file.
@@ -129,9 +129,11 @@ zookeeper_hosts: "
     {{- ips -}}"
 ```
 
-See this sample [playbook](https://github.com/AnsibleShipyard/ansible-galaxy-roles/blob/master/playbook.yml)
-which shows how to use this playbook as well as others. It is part of [ansible-galaxy-roles](https://github.com/AnsibleShipyard/ansible-galaxy-roles) and
-serves as a curation (and thus an example) of all our ansible playbooks.
+Usage
+```
+ansible-playbook -i inventory.ini zookeeper.yaml
+
+```
 
 License
 -------

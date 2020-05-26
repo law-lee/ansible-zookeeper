@@ -1,0 +1,4 @@
+- name: Installing ZooKeeper
+  hosts: all
+  roles:
+    - role: ansible-zookeeper
