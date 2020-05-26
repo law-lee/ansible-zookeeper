@@ -68,17 +68,6 @@ zookeeper_env: {}
 zookeeper_force_myid: yes
 ```
 
-Example Playbook
-----------------
-
-```
-- name: Installing ZooKeeper
-  hosts: all
-  sudo: yes
-  roles:
-    - role: AnsibleShipyard.ansible-zookeeper
-```
-
 Usage
 -----
 ```
